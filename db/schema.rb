@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2020_09_16_154424) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_20_213220) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,6 +32,7 @@ ActiveRecord::Schema[7.0].define(version: 2020_09_16_154424) do
     t.string "access_code", limit: 5, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "role", default: "warehouse", null: false
     t.index ["access_code"], name: "index_employees_on_access_code", unique: true
   end
 
@@ -80,6 +81,7 @@ ActiveRecord::Schema[7.0].define(version: 2020_09_16_154424) do
     t.string "price_currency", default: "USD", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "on_shelf", default: 0, null: false
     t.index ["name"], name: "index_products_on_name", unique: true
   end
 
@@ -88,13 +90,4 @@ ActiveRecord::Schema[7.0].define(version: 2020_09_16_154424) do
   add_foreign_key "inventory_status_changes", "employees", column: "actor_id"
   add_foreign_key "inventory_status_changes", "inventories"
   add_foreign_key "orders", "addresses", column: "ships_to_id"
-
-  create_view "product_on_shelf_quantities", sql_definition: <<-SQL
-      SELECT p.id AS product_id,
-      count(i.product_id) AS quantity
-     FROM (products p
-       LEFT JOIN inventories i ON (((p.id = i.product_id) AND (i.status = 'on_shelf'::inventory_statuses))))
-    GROUP BY p.id
-    ORDER BY p.id;
-  SQL
 end

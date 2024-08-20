@@ -32,6 +32,10 @@ class Order < ApplicationRecord
     inventories.any?
   end
 
+  # This method checks if an order is fulfillable. However, it might be missing some validation to ensure
+  # that the quantities of all items in the order are available on the shelf. The current logic does not check
+  # if the quantity of each line item in the order is less than or equal to the available quantity in inventory.
+
   def fulfillable?
     line_items.all?(&:fulfillable?)
   end
