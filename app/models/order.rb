@@ -33,25 +33,26 @@ class Order < ApplicationRecord
     inventories.any?
   end
 
-# have sufficient stock on the shelf. However, the current logic only ensures that the total
-# number of products on the shelf matches the total number of line items, which might not
-# correctly validate if each line item can be individually fulfilled based on its quantity.
-#
-# To address this, ensure that each line item's quantity is checked against its available
-# stock independently, rather than relying on aggregated counts.
+  # have sufficient stock on the shelf. However, the current logic only ensures that the total
+  # number of products on the shelf matches the total number of line items, which might not
+  # correctly validate if each line item can be individually fulfilled based on its quantity.
+  #
+  # To address this, ensure that each line item's quantity is checked against its available
+  # stock independently, rather than relying on aggregated counts.
 
   def fulfillable?
     line_items.all?(&:fulfillable?)
   end
 
   def mark_as_returned
-    raise "Permission denied" unless employee.can_handle_returns?
+    raise 'Permission denied' unless employee.can_handle_returns?
 
     update(returned: true)
     restock_return_product
   end
 
   private
+
   def restock_return_product
     line_items.each do |line_item|
       product = line_item.product

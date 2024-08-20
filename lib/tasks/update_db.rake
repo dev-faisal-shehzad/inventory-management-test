@@ -1,5 +1,5 @@
 namespace :update_db do
-  desc "Update on_shelf column for products using the view"
+  desc 'Update on_shelf column for products using the view'
   task update_on_shelf: :environment do
     Product.reset_column_information
 
