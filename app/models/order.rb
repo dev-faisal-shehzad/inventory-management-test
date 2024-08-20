@@ -3,6 +3,7 @@ class Order < ApplicationRecord
   has_many :line_items, class_name: 'OrderLineItem'
   has_many :inventories
 
+  scope :undeliverable_orders, -> { where(returned: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :fulfilled, -> { joins(:inventories).group('orders.id') }
   scope :not_fulfilled, -> { left_joins(:inventories).where(inventories: { order_id: nil }) }
@@ -32,11 +33,29 @@ class Order < ApplicationRecord
     inventories.any?
   end
 
-  # This method checks if an order is fulfillable. However, it might be missing some validation to ensure
-  # that the quantities of all items in the order are available on the shelf. The current logic does not check
-  # if the quantity of each line item in the order is less than or equal to the available quantity in inventory.
+# have sufficient stock on the shelf. However, the current logic only ensures that the total
+# number of products on the shelf matches the total number of line items, which might not
+# correctly validate if each line item can be individually fulfilled based on its quantity.
+#
+# To address this, ensure that each line item's quantity is checked against its available
+# stock independently, rather than relying on aggregated counts.
 
   def fulfillable?
     line_items.all?(&:fulfillable?)
+  end
+
+  def mark_as_returned
+    raise "Permission denied" unless employee.can_handle_returns?
+
+    update(returned: true)
+    restock_return_product
+  end
+
+  private
+  def restock_return_product
+    line_items.each do |line_item|
+      product = line_item.product
+      product.increment!(:on_shelf, line_item.quantity)
+    end
   end
 end

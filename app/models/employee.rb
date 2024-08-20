@@ -9,4 +9,12 @@ class Employee < ApplicationRecord
   validates :name, presence: true
   validates :access_code, uniqueness: true
   validates :role, presence: true, inclusion: { in: ROLES }
+
+  def can_handle_returns?
+    role == 'warehouse'
+  end
+
+  def can_view_returned_orders?
+    role == 'customer_service'
+  end
 end

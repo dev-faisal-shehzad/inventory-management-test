@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_08_20_213220) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_20_231637) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_20_213220) do
     t.string "city", null: false
     t.string "state", null: false
     t.string "zip", null: false
+    t.boolean "fixed", default: false, null: false
   end
 
   create_table "employees", force: :cascade do |t|
@@ -71,6 +72,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_20_213220) do
     t.bigint "ships_to_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "returned", default: false, null: false
+    t.index ["returned"], name: "index_orders_on_returned"
     t.index ["ships_to_id"], name: "index_orders_on_ships_to_id"
   end
 
