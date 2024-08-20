@@ -1,0 +1,14 @@
+{
+  "name": "inventory_management",
+  "private": true,
+  "dependencies": {
+    "@rails/webpacker": "5.4.4",
+    "@tailwindcss/ui": "^0.5.0",
+    "tailwindcss": "^1.7.6",
+    "yarn": "^1.22.5"
+  },
+  "version": "0.1.0",
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.0"
+  }
+}
