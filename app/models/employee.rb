@@ -8,7 +8,7 @@ class Employee < ApplicationRecord
 
   validates :name, presence: true
   validates :access_code, uniqueness: true
-  validates :role, presence: true, inclusion: { in: ROLES }
+  validates :role, presence: true, inclusion: { in: ROLES.values }
 
   def can_handle_returns?
     role == 'warehouse'

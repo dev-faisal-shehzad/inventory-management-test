@@ -7,17 +7,19 @@ class Product < ApplicationRecord
     inventory.on_shelf.count
   end
 
-  def needed_inventory_count
-    self.class.connection.select_value(<<~SQL)
-      SELECT GREATEST(
-        SUM(order_line_items.quantity) - (
-          SELECT quantity FROM product_on_shelf_quantities WHERE product_id = #{id}
-        ), 0)
+  def needed_inventory_count(id=nil)
+    sql = <<-SQL
+      SELECT COALESCE(SUM(order_line_items.quantity), 0) - COALESCE(products.on_shelf, 0)
       FROM order_line_items
-        LEFT OUTER JOIN inventories
-          ON order_line_items.order_id = inventories.order_id
-      WHERE order_line_items.product_id = #{id}
-        AND inventories.order_id IS NULL
+      JOIN products ON products.id = order_line_items.product_id
+      WHERE products.id = :product_id
+      GROUP BY products.id
     SQL
+
+    result = self.class.connection.select_value(
+      ActiveRecord::Base.send(:sanitize_sql_array, [sql, { product_id: id }])
+    )
+
+    result.to_i
   end
 end
