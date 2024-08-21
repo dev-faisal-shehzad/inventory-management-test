@@ -15,16 +15,27 @@ FactoryBot.define do
     city { 'New York City' }
     state { 'NY' }
     zip { '10001' }
+    fixed { false }
   end
 
   factory :employee do
     sequence(:name) { |n| "Employee ##{n}" }
     sequence(:access_code) { |n| format('%05d', n) }
+    role { Employee.roles.keys.sample }
+
+    trait :warehouse do
+      role { :warehouse }
+    end
+
+    trait :customer_service do
+      role { :customer_service }
+    end
   end
 
   factory :product do
     sequence(:name) { |n| "Product #{n}" }
     price factory: :amount
+    on_shelf { 0 }
   end
 
   factory :amount, class: Money do
