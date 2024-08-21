@@ -8,20 +8,20 @@ class Order < ApplicationRecord
   scope :fulfilled, -> { joins(:inventories).group('orders.id') }
   scope :not_fulfilled, -> { left_joins(:inventories).where(inventories: { order_id: nil }) }
   scope :fulfillable, lambda {
-                        not_fulfilled
-                          .joins(:line_items)
-                          .joins(<<~SQL)
-                            LEFT OUTER JOIN products
-                              ON order_line_items.product_id = products.id
-                             AND order_line_items.quantity <= products.on_shelf
-                          SQL
-                          .group(:id)
-                          .having(<<~SQL)
-                            COUNT(DISTINCT products.id) =
-                            COUNT(DISTINCT order_line_items.product_id)
-                          SQL
-                          .order(:created_at, :id)
-                      }
+    not_fulfilled
+      .joins(:line_items)
+      .joins(<<~SQL)
+        LEFT OUTER JOIN products
+          ON order_line_items.product_id = products.id
+         AND order_line_items.quantity <= products.on_shelf
+      SQL
+      .group(:id)
+      .having(<<~SQL)
+        COUNT(DISTINCT products.id) =
+        COUNT(DISTINCT order_line_items.product_id)
+      SQL
+      .order(:created_at, :id)
+  }
 
   def cost
     line_items.inject(Money.zero) do |acc, li|
