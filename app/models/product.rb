@@ -7,7 +7,7 @@ class Product < ApplicationRecord
     inventory.on_shelf.count
   end
 
-  def needed_inventory_count(id=nil)
+  def needed_inventory_count(id = nil)
     sql = <<-SQL
       SELECT COALESCE(SUM(order_line_items.quantity), 0) - COALESCE(products.on_shelf, 0)
       FROM order_line_items
